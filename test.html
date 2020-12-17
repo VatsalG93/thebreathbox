@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Fix Vocal Experiment </title>
+        <style>
+            #buttonId{
+                padding:20px 50px; 
+                font-size:20px; 
+                cursor:pointer;
+            }
+            #blackbox{
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            #blackbox:hover{
+                cursor: pointer;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="button">
+            <button id="buttonId" onClick="init()">Vocal record</button>
+            <br>
+            <img id="blackbox" src="images/blackbox.png" alt="blackbox" width="140" height="70" align="center">
+        </div>
+        <div id="visual" style="padding-top: 10px;">
+            <canvas id="waveform" width=400 height=100> </canvas>
+        </div>
+        <script>
+            var audioContext = null;
+            var analyser = null;
+            var distortion = null;
+            var timeArray = null;
+            var freqArray = null;
+            var freqBin = null;
+            var fftsize = 2048;
+            var constraints = {audio:true};
+            var canvasWave = document.getElementById("waveform");
+            var width = canvasWave.width;
+            var height = canvasWave.height;
+            
+            var canvasWaveCtx = canvasWave.getContext("2d");
+            
+            function init(){
+                try{
+                	window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.oAudioContext ||	window.msAudioContext;
+                						
+                    audioContext = new AudioContext();
+                    analyser = audioContext.createAnalyser();
+                    distortion = audioContext.createWaveShaper();
+                    freqBin = analyser.frequencyBinCount;
+                    console.log(freqBin);
+                    freqArray = new Uint8Array(analyser.frequencyBinCount);
+                    timeArray = new Uint8Array(analyser.frequencyBinCount);
+                    getAudioStream(constraints);
+        		}
+        		catch(e){
+        			alert('Exception :' + e);
+        		}
+            }
+            function getAudioStream(constraints){
+                try{            
+                    navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia;
+        			navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+        			    breathStream(stream, true);
+        			});
+                }
+         		catch(e){
+            			alert('Exception :' + e);
+            		}
+            }
+            function breathStream(audioStream,waveform = false){
+                console.log("breath starts");
+                src = audioContext.createMediaStreamSource(audioStream);
+                src.connect(analyser);
+                analyser.connect(distortion);
+                distortion.connect(audioContext.destination);
+                
+                analyser.fftSize = fftsize;
+                var bufferLength = analyser.frequencyBinCount;
+                
+                console.log(bufferLength);
+                canvasWaveCtx.clearRect(0,0,width,height);
+                
+                if (waveform != false){
+                    function drawWaveform(canvasCtx){
+                        analyser.getByteTimeDomainData(timeArray);
+                        analyser.getByteFrequencyData(freqArray);
+                        
+                        requestAnimationFrame(function(){
+                            drawWaveform(canvasCtx);
+                        });
+                        
+                        canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+                        canvasCtx.fillRect(0, 0, width, height);
+                        canvasCtx.lineWidth = 2;
+                        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+                        canvasCtx.beginPath();
+                        
+                        var sliceWidth = width * 1.0 / bufferLength;
+                        var x = 0;
+                        var y = 0;
+                        var total = 0;
+                        var RMSE = 0;
+    
+                        var node = audioContext.createScriptProcessor(fftsize*2, 1, 1);
+                        node.onaudioprocess = function () {
+                            var rms = this.getRMS(freqArray);
+                            console.log("rmse");
+                            console.log(rms);
+                        }
+                    
+                        for(var i = 0; i < bufferLength; i++) {
+                            var v = timeArray[i] / 128.0;
+                            RMSE += freqArray[i] * freqArray[i];
+                            //total += freqArray[i];
+                            
+                            y = v * height/2;
+                            if(i === 0) {
+                                canvasCtx.moveTo(x, y);
+                            }
+                            else{
+                                canvasCtx.lineTo(x, y);
+                            }
+                            x += sliceWidth;
+                        }
+                        //console.log(y);
+                        RMSE /= timeArray.length;
+                        RMSE = Math.sqrt(RMSE);
+                        
+                        document.getElementById("blackbox").style.transform = 'scale('+String(RMSE/25)+')';
+                        console.log("RMSE: ");
+                        console.log(RMSE);
+                        
+                        canvasCtx.lineTo(width, height/2);
+                        canvasCtx.stroke();
+                    }
+                    drawWaveform(canvasWaveCtx);
+                    //console.log(freqArray);
+                    //analyser.getByteFrequencyData();
+                    //analyser.getByteTimeDomainData();
+                    //analyser.getFloatTimeDomainData();
+                }
+                else{
+                    function scaleObject(imgElem){
+                        
+                    }  
+                }
+        }
+        </script>
+    </body>
+</html>
+
+    

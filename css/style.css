@@ -1,0 +1,50 @@
+/*backbone*/
+body {
+	font-family: 'Actor' ;
+	background-color: #FF8C00;
+}
+
+/*backbone*/
+.site-logo {
+	text-align: center;
+}
+
+
+* {
+box-sizing: border-box;
+}
+
+.column {
+float: left;
+width: 33.33%;
+padding: 5px;
+}
+
+.row::after {
+content: "";
+display: table;
+clear:
+}
+
+/* Three image containers (use 25% for four, and 50% for two, etc) */
+.column {
+  float: left;
+  width: 33.33%;
+  padding: 5px;
+}
+
+/* Clear floats after image containers */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+
+.wrapper {
+    text-align: center;
+}
+
+.button {
+    position: absolute;
+    top: 50%;

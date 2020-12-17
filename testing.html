@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Audio Recorder</title>
+	
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--Local CSS-->
+    <link rel="stylesheet" type="css/style.css" href="style.css">
+    <!--<link rel="stylesheet" type="text/css" href="sticky-footer.css">-->
+
+    <!--Google Font-->
+    <style>
+    html { overflow: visible; }
+	body { 
+		font: 14pt Arial, sans-serif; 
+		background: lightgrey;
+
+		height: 100vh;
+		width: 100%;
+		margin: 0px 10px;
+	}
+	#recordBtn{
+	   width : 8Rem;
+	   cursor:pointer;
+	}
+	#start {
+	   z-index: 10;
+	   width : 10Rem;
+	   cursor:pointer;	    
+	}
+	#visual {
+	    z-index: -1;
+	    position: absolute;
+	}
+	canvas{
+	    transform: translate(80%, 100%);
+		display: block; 
+		background: #202020; 
+		width: 150%;
+		height: 45%;
+		box-shadow: 0px 0px 10px blue;
+	}
+    #success {
+	    transform: translate(80%, 9Rem);
+		display: block; 
+		width: 150%;
+		height: 45%;
+	}
+	#controls {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-around;
+		height: 20%;
+		width: 100%;
+	}
+	#record { height: 15vh; }
+	#record.recording { 
+		background: red;
+		background: -webkit-radial-gradient(center, ellipse cover, #ff0000 0%,lightgrey 75%,lightgrey 100%,#7db9e8 100%); 
+		background: -moz-radial-gradient(center, ellipse cover, #ff0000 0%,lightgrey 75%,lightgrey 100%,#7db9e8 100%); 
+		background: radial-gradient(center, ellipse cover, #ff0000 0%,lightgrey 75%,lightgrey 100%,#7db9e8 100%); 
+	}
+	#save, #save img { height: 10vh; }
+	#save { opacity: 0.25;}
+	#save[download] { opacity: 1;}
+	#viz {
+		height: 80%;
+		width: 100%;
+		display: flex;
+		flex-direction: colum;
+		justify-content: space-around;
+		align-items: center;
+	}
+	@media (orientation: landscape) {
+		body { flex-direction: row;}
+		#controls { flex-direction: column; height: 100%; width: 10%;}
+		#viz { height: 100%; width: 90%;}
+	}
+
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+    h1
+    {
+    font-family: 'Montserrat';
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap');
+
+    h3
+    {
+    font-family: 'Montserrat';
+    }
+    h4
+    {
+    font-family: 'Montserrat';
+    }
+    </style>
+  </head>
+  <body style= "background-color:orange;">
+    
+    <h1 style="text-align:left;">Fix the Vocal!</h1>
+    <div id="visual" style="padding-top: 10px;">
+        <canvas id="waveform1" width=400 height=100> </canvas>
+        <br>
+        <h4 id="success" style="text-align:center;"></h4>
+        <br>
+        <canvas id="waveform2" width=400 height=100> </canvas>
+    </div>    
+    
+    <!-- FIRST TEXT INSTRUCTION-->
+    <h4 style="text-align:left;">You will now listen to an audio file,</h4>
+    <h4 style="text-align:left;">which contains slightly unclear human vocals.</h4>
+    <br>
+    <h5 id="count" style="text-align:left;text-color:blue;"></h5>
+    
+    <input id= "start" type="button" value="Click here and start" onclick="starter()"/>
+    
+    <!--1ST PLAY AUDIO BUTTON-->
+    <h4 style="text-align:left;">Play audio</h4>
+    
+     <audio id="distort" controls = "controls" style="outline: none">
+       <source id="audioS" src="audio/Distorted_audio.mpeg" type="audio/mpeg">
+      Your browser does not support the audio element.
+     </audio>
+    <br>
+    <br>
+    <!-- SECOND TEXT INSTRUCTION-->
+    <h4 style="text-align:left;">You will now record your own breath.</h4>
+    
+    <input id="recordBtn" type="button" value="Start Recording" onclick="recorder()"/>
+    
+    <h4 style="text-align:left;">Your exhalation will be seen on the right.</h4>
+    <h4 style="text-align:left;">If you breathe with a rhythm,</h4>
+    <h4 style="text-align:left;">it will cause a change in the audio clip above.</h4>
+    <br>
+    <script src="js/main.js" type="text/javascript" onload="console.log('loaded')"></script>
+    <script>
+        let audioClip1 = {
+            0:'audio/Clear_audio.mpeg', 
+            1:'audio/Distorted_audio.mpeg'
+        };
+        var out = null;
+        var record = document.getElementById('recordBtn');
+        var audio = document.getElementById('distort');
+        var startBtn = document.getElementById('start');
+        
+        function starter(){
+            out = init(audio, false, true,'waveform1','count','success','distort');
+        }
+        function recorder(){
+            out = init(audio, true, true, 'waveform2','count','success','distort');
+        }
+        console.log(out);
+    </script>
+     <!--BUTTON FOR NEXT PAGE-->
+    <nav class="nav justify-content-center"></nav>
+    <form action="https://gustovisuals.in/breather/Challenge2.html">
+        <input type="submit" class="middle" value="Next"/>
+    </form>
+    <br>
+    <br>
+  </body>
+</html>
